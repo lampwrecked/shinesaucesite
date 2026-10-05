@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shinesauce — Websites, Interactive Design & Installation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070B18;
+    --surface: #0E1526;
+    --surface-2: #121B33;
+    --text: #EDEFF7;
+    --text-dim: #8993B3;
+    --accent: #7FA8FF;
+    --accent-2: #BFE4FF;
+    --accent-deep: #2F56D6;
+    --line: #1B2440;
+    --section-alt: #131D3A;
+    --display: 'Bricolage Grotesque', 'Inter', -apple-system, sans-serif;
+    --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  :root[data-theme="light"] {
+    --bg: #F4F6FC;
+    --surface: #FFFFFF;
+    --surface-2: #E9EDFA;
+    --text: #131A33;
+    --text-dim: #5A6485;
+    --accent: #2F56D6;
+    --accent-2: #4A8FE0;
+    --accent-deep: #1E3EB0;
+    --line: #E1E5F5;
+    --section-alt: #E6EBF8;
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #070B18; --surface: #0E1526; --surface-2: #121B33;
+    --text: #EDEFF7; --text-dim: #8993B3;
+    --accent: #7FA8FF; --accent-2: #BFE4FF; --accent-deep: #2F56D6;
+    --line: #1B2440; --section-alt: #131D3A;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+
+  html { background: var(--bg); }
+  body { background: transparent; }
+
+  #bg-canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    z-index: 0; filter: blur(80px); opacity: 0.55; pointer-events: none;
+  }
+
+  #star-canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    z-index: 0; opacity: 0.9; pointer-events: none;
+  }
+
+  #spotlight {
+    position: absolute; top: 0; left: 0; width: 460px; height: 460px;
+    margin: -230px 0 0 -230px; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--accent) 26%, transparent) 0%, transparent 68%);
+    pointer-events: none; z-index: 1; opacity: 0; will-change: transform, opacity;
+    transition: opacity 0.4s ease;
+  }
+
+  #progress {
+    position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+    background: var(--accent); z-index: 100; transition: width 0.05s linear, background 0.3s ease;
+  }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+    border-bottom: 1px solid transparent;
+    transition: background 0.25s ease, border-color 0.25s ease;
+  }
+  nav.scrolled {
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(10px);
+    border-color: var(--line);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; padding: 20px 28px; }
+  .brand {
+    font-family: var(--display); font-weight: 600; font-size: 18px; text-decoration: none; letter-spacing: -0.01em;
+    display: inline-block; transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .brand:hover { transform: rotate(-3deg) scale(1.05); }
+  .navlinks { display: flex; gap: 30px; font-size: 14px; }
+  .navlinks a { text-decoration: none; color: var(--text-dim); transition: color 0.2s; }
+  .navlinks a:hover { color: var(--text); }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    position: relative; min-height: 92vh;
+    display: flex; align-items: center;
+    border-bottom: 1px solid var(--line);
+    padding-top: 90px;
+    overflow: hidden; background: var(--bg);
+  }
+  .hero-inner { position: relative; width: 100%; z-index: 2; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13.5px; color: var(--text-dim); margin-bottom: 28px;
+  }
+  .hero-eyebrow .swatch { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+  .shimmer-text {
+    background-image: linear-gradient(
+      100deg,
+      var(--text) 20%,
+      var(--accent-2) 42%,
+      var(--accent) 50%,
+      var(--accent-2) 58%,
+      var(--text) 80%
+    );
+    background-size: 260% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-position-x: 160%;
+    transition: background-position 0.15s ease-out;
+  }
+  #dyn-word { font-style: italic; color: inherit; }
+  .hero p.lede, .hero-eyebrow { text-shadow: 0 2px 22px rgba(7,11,24,0.85), 0 0 4px rgba(7,11,24,0.6); }
+  .hero h1 {
+    font-family: var(--display); font-weight: 600;
+    font-size: clamp(2.6rem, 6.2vw, 5rem);
+    line-height: 1.03; max-width: 16ch; margin: 0 0 30px; letter-spacing: -0.02em;
+  }
+  .hero p.lede { font-size: 18.5px; color: var(--text-dim); max-width: 46ch; margin: 0 0 42px; }
+  .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
+  .cta {
+    display: inline-block; text-decoration: none; font-size: 15px; font-weight: 500;
+    padding: 14px 26px; border-radius: 999px; transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .cta.primary { background: var(--text); color: var(--bg); }
+  .cta.primary:hover { transform: translateY(-1px); }
+  .cta.secondary { border: 1px solid var(--line); color: var(--text); }
+  .cta.secondary:hover { border-color: var(--text-dim); }
+
+  .hero-pointcloud {
+    position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
+    width: 380px; height: 380px; z-index: 2;
+  }
+  #point-cloud-canvas { width: 100%; height: 100%; display: block; }
+  @media (max-width: 900px) { .hero-pointcloud { display: none; } }
+
+
+
+  /* ---------- reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+  .reveal.d1 { transition-delay: 0.06s; }
+  .reveal.d2 { transition-delay: 0.12s; }
+  .reveal.d3 { transition-delay: 0.18s; }
+
+  /* ---------- Capabilities ---------- */
+  #capabilities { position: relative; z-index: 1; background: var(--section-alt); border-bottom: 1px solid var(--line); }
+  .cap-intro { padding: 72px 0 8px; }
+  .kicker { font-family: var(--sans); font-weight: 600; font-size: 13px; text-transform: none; color: var(--accent); margin: 0 0 12px; letter-spacing: 0.01em; }
+  .cap-intro h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.8rem, 3.2vw, 2.4rem); margin: 0; max-width: 20ch; letter-spacing: -0.015em; }
+
+  .cap-list { position: relative; }
+  .cap-line-track {
+    position: absolute; top: 6px; bottom: 6px; left: 0; width: 2px;
+    background: var(--line); border-radius: 2px;
+  }
+  .cap-line-fill {
+    position: absolute; top: 0; left: 0; width: 2px; height: 0%;
+    background: var(--accent); border-radius: 2px;
+  }
+  .cap-line-dot {
+    position: absolute; left: -3px; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--line); transform: scale(1);
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .cap-line-dot.active {
+    background: var(--accent); transform: scale(1.35);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  @media (max-width: 860px) { .cap-line-track, .cap-line-fill, .cap-line-dot { display: none; } }
+
+  .cap-section {
+    display: grid; grid-template-columns: 280px 1fr; gap: 56px;
+    padding: 60px 0 60px 22px; position: relative;
+  }
+  .cap-section::before {
+    content: ''; position: absolute; top: 0; left: 0; height: 1px; width: 0;
+    background: linear-gradient(90deg, var(--accent), var(--line) 70%, transparent);
+    transition: width 1.2s cubic-bezier(.22,.61,.36,1);
+  }
+  .cap-section.drawn::before { width: 100%; }
+  .cap-sticky { align-self: start; }
+  .cap-num { font-family: var(--sans); font-size: 13px; color: var(--accent); margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+  .cap-title { font-family: var(--display); font-weight: 600; font-size: clamp(1.5rem, 2.4vw, 1.9rem); line-height: 1.15; margin: 0 0 26px; letter-spacing: -0.01em; }
+
+  .cap-body p { color: var(--text-dim); font-size: 16px; max-width: 56ch; margin: 0 0 16px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+  .tag {
+    font-size: 13px; padding: 7px 14px;
+    border: 1px solid var(--line); border-radius: 999px; color: var(--text-dim);
+    background: var(--bg);
+  }
+
+  /* ---------- strip ---------- */
+  .strip {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 22px 0; background: var(--surface);
+  }
+  .strip .wrap { display: flex; flex-wrap: wrap; gap: 12px 30px; font-size: 13.5px; color: var(--text-dim); }
+  .strip .wrap span.dot { color: var(--accent); }
+
+  /* ---------- About ---------- */
+  section.block { position: relative; z-index: 1; background: var(--bg); padding: 68px 0; border-bottom: 1px solid var(--line); }
+  section.block:last-of-type { border-bottom: none; }
+  .about-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 60px; align-items: start; }
+  .about-body h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.7rem,3vw,2.2rem); margin: 0 0 22px; max-width: 18ch; letter-spacing: -0.015em; }
+  .about-body p { color: var(--text-dim); font-size: 16px; max-width: 52ch; }
+  .credentials { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px; }
+  .credentials dt { font-size: 12.5px; color: var(--text-dim); margin-top: 16px; }
+  .credentials dt:first-child { margin-top: 0; }
+  .credentials dd { margin: 4px 0 0; font-size: 15px; }
+
+  /* ---------- Contact ---------- */
+  .contact-band { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 30px; }
+  .contact-band h2 { font-family: var(--display); font-weight: 600; font-size: clamp(1.8rem,3vw,2.3rem); margin: 0; max-width: 15ch; letter-spacing: -0.015em; }
+  .contact-note { color: var(--text-dim); font-size: 15px; margin: 12px 0 0; max-width: 38ch; }
+  .email-link {
+    font-size: 17px; font-weight: 500; text-decoration: none;
+    padding: 14px 26px; border-radius: 999px; background: var(--accent-deep); color: #fff;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .email-link:hover { transform: translateY(-1px); background: color-mix(in srgb, var(--accent-deep) 85%, #000); }
+
+  button.email-link { border: 0; cursor: pointer; font-family: inherit; }
+  #email-dialog {
+    border: 1px solid var(--line); border-radius: 16px; padding: 32px 30px 28px;
+    background: var(--surface); color: var(--text); width: min(440px, calc(100% - 32px));
+    box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+  }
+  #email-dialog::backdrop { background: rgba(4,7,16,0.66); backdrop-filter: blur(4px); }
+  #email-dialog h3 { font-family: var(--display); font-weight: 600; font-size: 1.6rem; margin: 0 0 18px; letter-spacing: -0.01em; }
+  .dlg-addr {
+    font-size: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg); word-break: break-all; margin-bottom: 22px;
+  }
+  .dlg-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .dlg-actions .email-link { font-size: 15px; }
+  .dlg-copy {
+    font: inherit; font-size: 15px; font-weight: 500; padding: 14px 22px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer;
+  }
+  .dlg-copy:hover { border-color: var(--text-dim); }
+  .dlg-close {
+    position: absolute; top: 12px; right: 14px; width: 36px; height: 36px; border: 0; border-radius: 50%;
+    background: transparent; color: var(--text-dim); font-size: 24px; line-height: 1; cursor: pointer;
+  }
+  .dlg-close:hover { color: var(--text); background: var(--surface-2); }
+
+  footer { position: relative; z-index: 1; background: var(--bg); padding: 28px 0 44px; color: var(--text-dim); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+  @media (max-width: 860px) {
+    .cap-section { grid-template-columns: 1fr; gap: 22px; padding-left: 0; }
+    .cap-sticky { position: static; }
+    .about-grid { grid-template-columns: 1fr; gap: 32px; }
+  }
+  @media (max-width: 620px) { .navlinks { display: none; } }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<nav id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top">Shinesauce</a>
+    <div class="navlinks">
+      <a href="#capabilities">Capabilities</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div id="top" class="hero">
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <canvas id="star-canvas" aria-hidden="true"></canvas>
+  <div id="spotlight" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <div class="hero-eyebrow reveal is-visible"><span class="swatch"></span> Interactive design &amp; creative technology studio</div>
+    <h1 class="reveal is-visible shimmer-text">Websites, interactive design, and installations — <span id="dyn-word">built to shine</span>.</h1>
+    <p class="lede reveal is-visible d1"><strong>Shinesauce</strong> designs and builds interactive websites, digital art installations, and exhibition AV systems.</p>
+    <div class="hero-ctas reveal is-visible d2">
+      <a class="cta primary" href="#contact">Start a project</a>
+      <a class="cta secondary" href="#capabilities">See what we build</a>
+    </div>
+  </div>
+  <div class="hero-pointcloud" aria-hidden="true"><canvas id="point-cloud-canvas"></canvas></div>
+</div>
+
+<div class="strip">
+  <div class="wrap">
+    <span>Website Design &amp; Development <span class="dot">·</span></span>
+    <span>Interactive Front-Ends <span class="dot">·</span></span>
+    <span>Event Experience Design <span class="dot">·</span></span>
+    <span>Installation Design <span class="dot">·</span></span>
+    <span>Conference Exhibition Design <span class="dot">·</span></span>
+    <span>Projection Mapping <span class="dot">·</span></span>
+    <span>Exhibition AV <span class="dot">·</span></span>
+    <span>Sound Reinforcement <span class="dot">·</span></span>
+    <span>Technical Consulting</span>
+  </div>
+</div>
+
+<div id="capabilities">
+  <div class="wrap cap-intro reveal">
+    <p class="kicker">What we build</p>
+    <h2>Three disciplines, one studio.</h2>
+  </div>
+
+  <div class="wrap">
+    <div class="cap-list" id="cap-list">
+      <div class="cap-line-track"></div>
+      <div class="cap-line-fill" id="cap-line-fill"></div>
+      <div class="cap-line-dot" id="cap-dot-0"></div>
+      <div class="cap-line-dot" id="cap-dot-1"></div>
+      <div class="cap-line-dot" id="cap-dot-2"></div>
+
+    <div class="cap-section">
+      <div class="cap-sticky">
+        <div class="cap-num">01 / 03</div>
+        <h3 class="cap-title reveal">Websites &amp; Interactive Design</h3>
+      </div>
+      <div class="cap-body">
+        <p class="reveal">Custom sites and interactive tools for artists and brands who want their web presence to feel as considered as the work itself.</p>
+        <p class="reveal d1">Portfolio sites, generative interfaces, and small interactive builds — clean typography, deliberate motion, and design that holds attention.</p>
+        <div class="tag-list reveal d2">
+          <span class="tag">Custom Front-Ends</span>
+          <span class="tag">Interactive Interfaces</span>
+          <span class="tag">Motion Design</span>
+          <span class="tag">Artist &amp; Brand Sites</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cap-section">
+      <div class="cap-sticky">
+        <div class="cap-num">02 / 03</div>
+        <h3 class="cap-title reveal">Digital Art &amp; Installation</h3>
+      </div>
+      <div class="cap-body">
+        <p class="reveal">Physical installation and exhibition work — objects, projections, and spatial pieces for galleries, conferences, and in-person events, designed to hold a room.</p>
+        <div class="tag-list reveal d1">
+          <span class="tag">Installation Design</span>
+          <span class="tag">Conference Exhibition Design</span>
+          <span class="tag">Event Experience Design</span>
+          <span class="tag">Laser Engraving</span>
+          <span class="tag">3D Scanning</span>
+          <span class="tag">Digital Sculpting</span>
+          <span class="tag">Projection Mapping</span>
+          <span class="tag">On-Site Install &amp; Strike</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cap-section">
+      <div class="cap-sticky">
+        <div class="cap-num">03 / 03</div>
+        <h3 class="cap-title reveal">AV Technical Systems</h3>
+      </div>
+      <div class="cap-body">
+        <p class="reveal">Full gallery and exhibition AV — sound reinforcement, projector and video setup, signal routing between audio and video sources, and lighting cues built around the piece.</p>
+        <div class="tag-list reveal d1">
+          <span class="tag">Exhibition AV</span>
+          <span class="tag">Sound Reinforcement</span>
+          <span class="tag">Projection &amp; Video</span>
+          <span class="tag">Video Production</span>
+        </div>
+      </div>
+    </div>
+
+    </div>
+  </div>
+</div>
+
+<section class="block" id="about">
+  <div class="wrap">
+    <div class="about-body">
+      <p class="kicker reveal">Who's behind it</p>
+      <h2 class="reveal d1">Backed by real installation experience.</h2>
+      <p class="reveal d2"><strong>Shinesauce</strong> is led by Jes Lamprecht, whose background spans exhibition coordination, AV systems, and installation logistics in professional gallery settings.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="contact">
+  <div class="wrap contact-band">
+    <div>
+      <p class="kicker reveal">Get in touch</p>
+      <h2 class="reveal d1">Have a project in mind?</h2>
+    </div>
+    <button type="button" class="email-link reveal d2" id="email-open">Email us</button>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex; justify-content:space-between; width:100%; flex-wrap:wrap; gap:10px;">
+    <span>Shinesauce Studios LLC</span>
+    <span>New York</span>
+  </div>
+</footer>
+
+<dialog id="email-dialog" aria-labelledby="email-dialog-title">
+  <button type="button" class="dlg-close" id="email-close" aria-label="Close">&times;</button>
+  <p class="kicker">Get in touch</p>
+  <h3 id="email-dialog-title">Email Shinesauce</h3>
+  <div class="dlg-addr">shinesaucestudios@gmail.com</div>
+  <div class="dlg-actions">
+    <a class="email-link" href="mailto:shinesaucestudios@gmail.com">Open in email</a>
+    <button type="button" class="dlg-copy" id="email-copy">Copy address</button>
+  </div>
+</dialog>
+
+<script>
+(function() {
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var progress = document.getElementById('progress');
+  var nav = document.getElementById('nav');
+  var root = document.documentElement;
+  var hero = document.getElementById('top');
+  var heroVisible = true;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function(en) { heroVisible = en[0].isIntersecting; }).observe(hero);
+  }
+
+  function onScroll() {
+    var doc = document.documentElement;
+    var scrollTop = doc.scrollTop || document.body.scrollTop;
+    var scrollH = doc.scrollHeight - doc.clientHeight;
+    var pct = scrollH > 0 ? (scrollTop / scrollH) * 100 : 0;
+    progress.style.width = pct + '%';
+    nav.classList.toggle('scrolled', scrollTop > 30);
+    updateShimmer();
+    updateLine();
+  }
+
+  var shimmerEls = document.querySelectorAll('.shimmer-text');
+  function updateShimmer() {
+    var vh = window.innerHeight;
+    for (var i = 0; i < shimmerEls.length; i++) {
+      var el = shimmerEls[i];
+      var rect = el.getBoundingClientRect();
+      var centerProgress = 1 - (rect.top + rect.height / 2) / vh;
+      var pos = 160 - centerProgress * 130;
+      el.style.backgroundPositionX = pos + '%';
+    }
+  }
+
+  var capSections = document.querySelectorAll('.cap-section');
+  var capList = document.getElementById('cap-list');
+  var lineFill = document.getElementById('cap-line-fill');
+  var dots = [document.getElementById('cap-dot-0'), document.getElementById('cap-dot-1'), document.getElementById('cap-dot-2')];
+
+  function layoutLine() {
+    if (!capList) return;
+    var listRect = capList.getBoundingClientRect();
+    for (var i = 0; i < capSections.length && i < dots.length; i++) {
+      var r = capSections[i].getBoundingClientRect();
+      var centerY = (r.top - listRect.top) + 28; /* align near the number label */
+      dots[i].style.top = centerY + 'px';
+    }
+  }
+
+  function updateLine() {
+    if (!capList || !lineFill) return;
+    var vh = window.innerHeight;
+    var rect = capList.getBoundingClientRect();
+    var total = rect.height;
+    var scrolledPast = (vh * 0.85) - rect.top;
+    var pct = total > 0 ? (scrolledPast / total) : 0;
+    if (pct < 0) pct = 0; if (pct > 1) pct = 1;
+    lineFill.style.height = (pct * 100) + '%';
+
+    var filledPx = pct * total;
+    for (var i = 0; i < dots.length; i++) {
+      var dotPos = parseFloat(dots[i].style.top || '0');
+      dots[i].classList.toggle('active', filledPx >= dotPos);
+    }
+  }
+
+  window.addEventListener('resize', layoutLine);
+  layoutLine();
+
+  var revealEls = document.querySelectorAll('.reveal:not(.is-visible)');
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2, rootMargin: '0px 0px -6% 0px' });
+    revealEls.forEach(function(el) { io.observe(el); });
+
+    var lineIO = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('drawn');
+          lineIO.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    capSections.forEach(function(el) { lineIO.observe(el); });
+  } else {
+    revealEls.forEach(function(el) { el.classList.add('is-visible'); });
+    capSections.forEach(function(el) { el.classList.add('drawn'); });
+  }
+
+  /* ---------- simple generative background: drifting soft blobs ---------- */
+  var canvas = document.getElementById('bg-canvas');
+  var ctx = canvas.getContext('2d');
+  var w, h, dpr;
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = hero.clientWidth; h = hero.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var blobs = [
+    { x: 0.18, y: 0.28, r: 0.38, sx: 0.00011, sy: 0.00008, phase: 0 },
+    { x: 0.75, y: 0.22, r: 0.30, sx: -0.00009, sy: 0.00012, phase: 2 },
+    { x: 0.55, y: 0.72, r: 0.34, sx: 0.00013, sy: -0.00010, phase: 4 }
+  ];
+
+  function hslToRgbStr(hue, sat, light, alpha) {
+    return 'hsla(' + hue + ',' + sat + '%,' + light + '%,' + alpha + ')';
+  }
+
+  function drawBlobs(time) {
+    if (!heroVisible && !reduceMotion) { requestAnimationFrame(drawBlobs); return; }
+    ctx.clearRect(0, 0, w, h);
+    var hues = [225, 235, 210];
+    for (var i = 0; i < blobs.length; i++) {
+      var b = blobs[i];
+      var cx = (b.x + Math.sin(time * b.sx + b.phase) * 0.06) * w;
+      var cy = (b.y + Math.cos(time * b.sy + b.phase) * 0.06) * h;
+      var r = b.r * Math.max(w, h);
+      var hue = hues[i] + Math.sin(time * 0.00004 + i) * 12;
+      var grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      var lightness = i === 1 ? 16 : 66;
+      grad.addColorStop(0, hslToRgbStr(hue, 80, lightness, i === 1 ? 0.7 : 0.55));
+      grad.addColorStop(1, hslToRgbStr(hue, 80, lightness, 0));
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (!reduceMotion) requestAnimationFrame(drawBlobs);
+  }
+
+  if (reduceMotion) {
+    drawBlobs(0);
+  } else {
+    requestAnimationFrame(drawBlobs);
+  }
+
+  /* ---------- fluid starfield: three depth layers, slow viscous motion, swirl on tap/drag, drift on scroll ---------- */
+  var starCanvas = document.getElementById('star-canvas');
+  var starCtx = starCanvas.getContext('2d');
+  var sw, sh, sdpr, stars = [];
+  var mouseX = -9999, mouseY = -9999, prevMX = -9999, prevMY = -9999;
+  var pointerDown = false;
+  var shooting = [];
+  var nextShootAt = 0;
+  /* liquid slosh: three oscillator modes (main rock + two smaller, faster ripple modes),
+     driven by scroll ACCELERATION (not velocity), plus a direct tilt while moving */
+  var m1 = { p: 0, v: 0, k: 0.008, c: 0.086 };
+  var m2 = { p: 0, v: 0, k: 0.030, c: 0.095 };
+  var m3 = { p: 0, v: 0, k: 0.075, c: 0.12 };
+  var scrollAccum = 0, scrollVel = 0, prevScrollVel = 0, directTilt = 0;
+  var lagP1 = 0, lagP2 = 0;  /* deeper layers follow the surface late */
+  var lastScrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  var vortices = [];
+  var bubbles = [];
+  var nextBubbleAt = 0;
+  var sheens = [
+    { ox: 0.25, oy: 0.35, r: 0.5, sx: 0.00021, sy: 0.00017, ph: 0.4 },
+    { ox: 0.7, oy: 0.6, r: 0.42, sx: -0.00017, sy: 0.00023, ph: 2.1 },
+    { ox: 0.5, oy: 0.2, r: 0.36, sx: 0.00025, sy: -0.00015, ph: 4.0 }
+  ];
+
+  /* layer 0 = far (tiny, dim, barely reacts), 1 = mid, 2 = near (bigger, brighter, reacts most) */
+  var LAYERS = [
+    { share: 0.55, rMin: 0.35, rMax: 0.75, bMin: 0.15, bMax: 0.4, resp: 0.3,  par: 0.035, maxSp: 0.5 },
+    { share: 0.30, rMin: 0.8,  rMax: 1.3,  bMin: 0.3,  bMax: 0.6, resp: 0.65, par: 0.1,   maxSp: 0.9 },
+    { share: 0.15, rMin: 1.4,  rMax: 2.2,  bMin: 0.5,  bMax: 0.9, resp: 1.0,  par: 0.2,   maxSp: 1.3 }
+  ];
+
+  /* obstacles: text and UI the liquid flows around (viewport coords, refreshed on scroll/resize) */
+  var obstacleEls = document.querySelectorAll('.hero h1, .hero .lede, .hero-eyebrow, .hero-ctas .cta');
+  var obstacles = [];
+  var obstaclesDirty = true;
+  function refreshObstacles() {
+    obstacles = [];
+    var pad = 14;
+    var hr = hero.getBoundingClientRect();
+    for (var oi = 0; oi < obstacleEls.length; oi++) {
+      var r = obstacleEls[oi].getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      obstacles.push({ l: r.left - hr.left - pad, r: r.right - hr.left + pad, t: r.top - hr.top - pad, b: r.bottom - hr.top + pad });
+    }
+    obstaclesDirty = false;
+  }
+  window.addEventListener('scroll', function() { obstaclesDirty = true; }, { passive: true });
+  window.addEventListener('resize', function() { obstaclesDirty = true; });
+  setInterval(function() { obstaclesDirty = true; }, 900);
+
+  function starResize() {
+    sdpr = Math.min(window.devicePixelRatio || 1, 2);
+    sw = hero.clientWidth; sh = hero.clientHeight;
+    starCanvas.width = sw * sdpr; starCanvas.height = sh * sdpr;
+    starCanvas.style.width = sw + 'px'; starCanvas.style.height = sh + 'px';
+    starCtx.setTransform(sdpr, 0, 0, sdpr, 0, 0);
+    var total = Math.round((sw * sh) / 1400);
+    stars = [];
+    for (var L = 0; L < LAYERS.length; L++) {
+      var cfg = LAYERS[L];
+      var count = Math.round(total * cfg.share);
+      for (var i = 0; i < count; i++) {
+        var x = Math.random() * sw, y = Math.random() * sh;
+        stars.push({
+          x: x, y: y, hx: x, hy: y, vx: 0, vy: 0,
+          layer: L,
+          r: cfg.rMin + Math.random() * (cfg.rMax - cfg.rMin),
+          base: cfg.bMin + Math.random() * (cfg.bMax - cfg.bMin),
+          speed: 0.0006 + Math.random() * 0.0018,
+          phase: Math.random() * Math.PI * 2,
+          tint: Math.random() < 0.14,
+          halo: L > 0 && Math.random() < 0.14
+        });
+      }
+    }
+  }
+  starResize();
+  window.addEventListener('resize', starResize);
+
+  function addVortex(x, y, strength, radius) {
+    vortices.push({ x: x, y: y, s: strength, r: radius, life: 1 });
+  }
+
+  function pointerMove(x, y) {
+    if (prevMX > -1000) {
+      var dx = x - prevMX, dy = y - prevMY;
+      var speed = Math.sqrt(dx * dx + dy * dy);
+      if (speed > 1.5) {
+        addVortex(x, y, Math.min(speed, 40) * (pointerDown ? 0.035 : 0.015), pointerDown ? 240 : 170);
+      }
+    }
+    prevMX = x; prevMY = y;
+    mouseX = x; mouseY = y;
+  }
+
+  function hx(x) { return x - hero.getBoundingClientRect().left; }
+  function hy(y) { return y - hero.getBoundingClientRect().top; }
+  hero.addEventListener('mousemove', function(e) { pointerMove(hx(e.clientX), hy(e.clientY)); }, { passive: true });
+  hero.addEventListener('mouseleave', function() { prevMX = -9999; prevMY = -9999; mouseX = -9999; mouseY = -9999; });
+  hero.addEventListener('mousedown', function(e) { pointerDown = true; addVortex(hx(e.clientX), hy(e.clientY), 1.4, 280); });
+  window.addEventListener('mouseup', function() { pointerDown = false; });
+  hero.addEventListener('touchstart', function(e) {
+    var t = e.touches[0], x = hx(t.clientX), y = hy(t.clientY);
+    pointerDown = true; prevMX = x; prevMY = y; mouseX = x; mouseY = y;
+    addVortex(x, y, 1.6, 300);
+  }, { passive: true });
+  hero.addEventListener('touchmove', function(e) { var t = e.touches[0]; pointerMove(hx(t.clientX), hy(t.clientY)); }, { passive: true });
+  hero.addEventListener('touchend', function() {
+    pointerDown = false; prevMX = -9999; prevMY = -9999; mouseX = -9999; mouseY = -9999;
+  });
+
+  window.addEventListener('scroll', function() {
+    var st = document.documentElement.scrollTop || document.body.scrollTop;
+    scrollAccum += (st - lastScrollTop);
+    lastScrollTop = st;
+  }, { passive: true });
+
+  function spawnShootingStar() {
+    var fromLeft = Math.random() < 0.5;
+    shooting.push({
+      x: fromLeft ? -40 : sw + 40,
+      y: Math.random() * sh * 0.5,
+      vx: (fromLeft ? 1 : -1) * (9 + Math.random() * 6),
+      vy: 3 + Math.random() * 3,
+      life: 0,
+      maxLife: 55 + Math.random() * 25
+    });
+  }
+
+  function drawStars(time) {
+    if (!heroVisible && !reduceMotion) { requestAnimationFrame(drawStars); return; }
+    if (obstaclesDirty) refreshObstacles();
+    starCtx.clearRect(0, 0, sw, sh);
+    var starColor = getComputedStyle(document.documentElement).getPropertyValue('--text').trim() || '#EDEFF7';
+    var tintColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim() || '#BFE4FF';
+    var accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#7FA8FF';
+    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+    /* scroll velocity (per frame, smoothed) and acceleration */
+    var rawVel = scrollAccum; scrollAccum = 0;
+    scrollVel += (rawVel - scrollVel) * 0.35;
+    var accel = scrollVel - prevScrollVel;
+    prevScrollVel = scrollVel;
+
+    /* the bucket accelerating is what makes liquid slosh: kick all modes on acceleration, saturating */
+    var kick = Math.tanh(accel / 18) * 2.2;
+    m1.v += kick; m2.v += kick * 0.9; m3.v += kick * 0.7;
+
+    /* while moving at speed the surface simply tilts, immediately, no delay */
+    directTilt += (Math.tanh(scrollVel / 30) * 26 - directTilt) * 0.25;
+
+    /* integrate the three modes */
+    m1.v += -m1.k * m1.p - m1.c * m1.v; m1.p += m1.v;
+    m2.v += -m2.k * m2.p - m2.c * m2.v; m2.p += m2.v;
+    m3.v += -m3.k * m3.p - m3.c * m3.v; m3.p += m3.v;
+
+    /* soft limits instead of hard clamps, so a long scroll keeps flowing instead of stalling */
+    var p1 = 80 * Math.tanh(m1.p / 80), p2 = 30 * Math.tanh(m2.p / 30), p3 = 12 * Math.tanh(m3.p / 12);
+    lagP1 += (p1 - lagP1) * 0.12; lagP2 += (p1 - lagP2) * 0.3;
+    var t = time * 0.00012;
+
+    for (var v = vortices.length - 1; v >= 0; v--) {
+      vortices[v].life *= 0.95;
+      if (vortices[v].life < 0.02) vortices.splice(v, 1);
+    }
+
+    /* bubbles: plumes that rise from below, pushing and curling the stars as they pass */
+    if (!reduceMotion && time > nextBubbleAt) {
+      bubbles.push({
+        x: Math.random() * sw,
+        y: sh + 60,
+        r: 80 + Math.random() * 110,
+        vy: -(0.55 + Math.random() * 0.6),
+        spin: Math.random() < 0.5 ? 1 : -1,
+        life: 1
+      });
+      nextBubbleAt = time + 1100 + Math.random() * 1600;
+    }
+    for (var bIdx = bubbles.length - 1; bIdx >= 0; bIdx--) {
+      var bu = bubbles[bIdx];
+      bu.y += bu.vy;
+      bu.x += Math.sin(time * 0.001 + bIdx) * 0.25;
+      if (bu.y < -bu.r) bubbles.splice(bIdx, 1);
+    }
+
+    /* density grid: count stars per cell so crowded cells can be thinned out */
+    var cell = 44;
+    var gcols = Math.ceil(sw / cell) + 1, grows = Math.ceil(sh / cell) + 1;
+    var counts = new Uint16Array(gcols * grows);
+    for (var ci = 0; ci < stars.length; ci++) {
+      var gx = (stars[ci].x / cell) | 0, gy = (stars[ci].y / cell) | 0;
+      if (gx >= 0 && gy >= 0 && gx < gcols && gy < grows) counts[gy * gcols + gx]++;
+    }
+    var expected = stars.length / (gcols * grows);
+
+    var display = [];
+    var ft = time * 0.00016;
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var cfg = LAYERS[s.layer];
+      var resp = cfg.resp;
+
+      /* constant motion: home positions ride a divergence-free curl flow plus a slow global current.
+         divergence-free means the field never clumps or thins, no matter how long it runs. */
+      var k1 = 0.0035, k2 = 0.0011, k3 = 0.0095;
+      var ax = s.hx * k1 + ft, ay = s.hy * k1 - ft * 0.7;
+      var bx = s.hx * k2 - ft * 0.6, by = s.hy * k2 + ft * 0.45;
+      var cx = s.hx * k3 + ft * 2.1, cy = s.hy * k3 - ft * 1.7;
+      var dPdx = 1.0 * k1 * Math.cos(ax) * Math.cos(ay) + 2.2 * k2 * Math.cos(bx) * Math.cos(by) + 0.12 * k3 * Math.cos(cx) * Math.cos(cy);
+      var dPdy = -1.0 * k1 * Math.sin(ax) * Math.sin(ay) - 2.2 * k2 * Math.sin(bx) * Math.sin(by) - 0.12 * k3 * Math.sin(cx) * Math.sin(cy);
+      var flowScale = 44 * (0.25 + s.layer * 0.42);
+      var fxh = dPdy * flowScale + 0.05 * (0.3 + s.layer * 0.5);
+      var fyh = -dPdx * flowScale - 0.03 * (0.3 + s.layer * 0.5);
+      s.hx += fxh; s.hy += fyh;
+
+      /* wrap homes, carrying the star with them so the spring never snaps across the screen */
+      if (s.hx < -20) { s.hx += sw + 40; s.x += sw + 40; }
+      if (s.hx > sw + 20) { s.hx -= sw + 40; s.x -= sw + 40; }
+      if (s.hy < -20) { s.hy += sh + 40; s.y += sh + 40; }
+      if (s.hy > sh + 20) { s.hy -= sh + 40; s.y -= sh + 40; }
+
+      /* scroll: gentle drift with momentum */
+      s.vy -= (m1.v + m2.v * 0.5) * 0.1 * resp;
+
+      /* vortices */
+      for (var k = 0; k < vortices.length; k++) {
+        var vo = vortices[k];
+        var dx = s.x - vo.x, dy = s.y - vo.y;
+        var d2 = dx * dx + dy * dy;
+        if (d2 < vo.r * vo.r && d2 > 1) {
+          var dist = Math.sqrt(d2);
+          var fall = (1 - dist / vo.r) * vo.life * vo.s * resp;
+          s.vx += (-dy / dist) * fall * 0.9 + (dx / dist) * fall * 0.2;
+          s.vy += (dx / dist) * fall * 0.9 + (dy / dist) * fall * 0.2;
+        }
+      }
+
+      /* bubbles: radial push + swirl as each plume passes */
+      for (var bb2 = 0; bb2 < bubbles.length; bb2++) {
+        var bub = bubbles[bb2];
+        var bdx = s.x - bub.x, bdy = s.y - bub.y;
+        var bd2 = bdx * bdx + bdy * bdy;
+        if (bd2 < bub.r * bub.r && bd2 > 1) {
+          var bd = Math.sqrt(bd2);
+          var bf = (1 - bd / bub.r) * 0.06 * resp;
+          s.vx += (bdx / bd) * bf * 0.8 + (-bdy / bd) * bf * bub.spin * 0.7;
+          s.vy += (bdy / bd) * bf * 0.8 + (bdx / bd) * bf * bub.spin * 0.7 + bub.vy * bf * 0.4;
+        }
+      }
+
+      /* screen edges: the liquid presses against the walls and slides along them */
+      var edgeZone = 56;
+      if (s.x < edgeZone)      { var eL = (edgeZone - s.x) / edgeZone; s.vx += eL * 0.02 * resp; s.vy += eL * 0.003 * resp; }
+      if (s.x > sw - edgeZone) { var eR = (s.x - (sw - edgeZone)) / edgeZone; s.vx -= eR * 0.02 * resp; s.vy -= eR * 0.003 * resp; }
+      if (s.y < edgeZone)      { var eT = (edgeZone - s.y) / edgeZone; s.vy += eT * 0.02 * resp; s.vx -= eT * 0.003 * resp; }
+      if (s.y > sh - edgeZone) { var eB = (s.y - (sh - edgeZone)) / edgeZone; s.vy -= eB * 0.05 * resp; s.vx += eB * 0.005 * resp; }
+
+      /* obstacles: text and buttons deflect the flow gently; stars that do pass under them dim rather than pile up at the edge */
+      s.under = false;
+      for (var ob = 0; ob < obstacles.length; ob++) {
+        var o = obstacles[ob];
+        if (s.x > o.l && s.x < o.r && s.y > o.t && s.y < o.b) {
+          s.under = true;
+          var dl = s.x - o.l, dr = o.r - s.x, dt = s.y - o.t, db = o.b - s.y;
+          var m = Math.min(dl, dr, dt, db);
+          var push = Math.min(0.045, 0.01 + m * 0.0015) * resp;
+          if (m === dl) s.vx -= push; else if (m === dr) s.vx += push;
+          else if (m === dt) s.vy -= push; else s.vy += push;
+        }
+      }
+
+      /* shooting stars: a wake that shoves stars aside and drags them a little along its path */
+      for (var sh2 = 0; sh2 < shooting.length; sh2++) {
+        var ss = shooting[sh2];
+        var wdx = s.x - ss.x, wdy = s.y - ss.y;
+        var wd2 = wdx * wdx + wdy * wdy;
+        var wr = 110;
+        if (wd2 < wr * wr && wd2 > 1) {
+          var wd = Math.sqrt(wd2);
+          var wf = (1 - wd / wr) * 0.5 * resp;
+          s.vx += (wdx / wd) * wf * 0.8 + ss.vx * wf * 0.08;
+          s.vy += (wdy / wd) * wf * 0.8 + ss.vy * wf * 0.08;
+        }
+      }
+
+      /* dispersion: if this cell is crowded, ease the star away from the cell centre */
+      var cgx = (s.x / cell) | 0, cgy = (s.y / cell) | 0;
+      if (cgx >= 0 && cgy >= 0 && cgx < gcols && cgy < grows) {
+        var crowd = counts[cgy * gcols + cgx] / expected;
+        if (crowd > 1.7) {
+          var ccx = (cgx + 0.5) * cell, ccy = (cgy + 0.5) * cell;
+          var ddx2 = s.x - ccx, ddy2 = s.y - ccy;
+          var dl2 = Math.sqrt(ddx2 * ddx2 + ddy2 * ddy2) || 1;
+          var disp = Math.min(0.06, (crowd - 1.7) * 0.02);
+          s.vx += (ddx2 / dl2) * disp; s.vy += (ddy2 / dl2) * disp;
+        }
+      }
+
+      /* spring home: keeps the field evenly filled forever */
+      s.vx += (s.hx - s.x) * 0.0035;
+      s.vy += (s.hy - s.y) * 0.0035;
+
+      /* viscous damping + speed cap = honey */
+      s.vx *= 0.9; s.vy *= 0.9;
+      var sp = Math.sqrt(s.vx * s.vx + s.vy * s.vy);
+      if (sp > cfg.maxSp) { s.vx = s.vx / sp * cfg.maxSp; s.vy = s.vy / sp * cfg.maxSp; }
+      s.x += s.vx; s.y += s.vy;
+
+      /* depth parallax on scroll, display-only so nothing drifts */
+      var tilt = (s.x / sw - 0.5) * 2;                        /* -1 left edge .. +1 right edge */
+      var sloshAmp = 0.35 + resp * 0.65;
+      /* deeper layers see a delayed surface */
+      var pMain = s.layer === 0 ? lagP1 : (s.layer === 1 ? lagP2 : p1);
+      var wave1 = pMain * (0.5 + 0.4 * tilt) + m1.v * 5 * tilt;                 /* main rock, rolling across */
+      var wave2 = p2 * (0.35 + 0.5 * Math.sin(s.x * 0.012 + m2.p * 0.02)) ;      /* faster ripple mode, spatially varied */
+      var wave3 = p3 * Math.sin(s.x * 0.03 + s.y * 0.01) ;                        /* tiny fast jiggle */
+      var sloshY = -sloshAmp * (wave1 + 0.55 * wave2 + 0.35 * wave3) - directTilt * sloshAmp * (0.6 + 0.4 * tilt);
+      var sloshX = (m1.v * 3 + m2.v * 1.2) * resp;                                 /* sideways sway */
+      var py = s.y - scrollTop * cfg.par + sloshY;
+      py = ((py % sh) + sh) % sh;
+      display.push({ x: s.x + sloshX, y: py, r: s.r, base: s.base, speed: s.speed, phase: s.phase, tint: s.tint, vx: s.vx, vy: s.vy, layer: s.layer, halo: s.halo, under: s.under });
+    }
+
+    /* liquid sheen: soft drifting highlights and shadow pools */
+    for (var shI = 0; shI < sheens.length; shI++) {
+      var sn = sheens[shI];
+      var scx = (sn.ox + Math.sin(time * sn.sx + sn.ph) * 0.18) * sw;
+      var scy = (sn.oy + Math.cos(time * sn.sy + sn.ph) * 0.18) * sh;
+      var srad = sn.r * Math.max(sw, sh);
+      var sg = starCtx.createRadialGradient(scx, scy, 0, scx, scy, srad);
+      var bright = shI !== 1;
+      sg.addColorStop(0, bright ? 'rgba(191,228,255,0.13)' : 'rgba(3,6,20,0.45)');
+      sg.addColorStop(0.5, bright ? 'rgba(127,168,255,0.05)' : 'rgba(3,6,20,0.18)');
+      sg.addColorStop(1, 'rgba(0,0,0,0)');
+      starCtx.globalAlpha = 1;
+      starCtx.fillStyle = sg;
+      starCtx.beginPath(); starCtx.arc(scx, scy, srad, 0, Math.PI * 2); starCtx.fill();
+    }
+
+    /* constellation lines near the cursor (near + mid layers only) */
+    if (mouseX > -1000) {
+      var near = [];
+      for (var j = 0; j < display.length; j++) {
+        if (display[j].layer === 0) continue;
+        var ndx = display[j].x - mouseX, ndy = display[j].y - mouseY;
+        if (ndx * ndx + ndy * ndy < 150 * 150 && near.length < 70) near.push(display[j]);
+      }
+      starCtx.lineWidth = 0.8;
+      for (var a = 0; a < near.length; a++) {
+        for (var b = a + 1; b < near.length; b++) {
+          var ddx = near[a].x - near[b].x, ddy = near[a].y - near[b].y;
+          var dd = Math.sqrt(ddx * ddx + ddy * ddy);
+          if (dd < 120) {
+            starCtx.globalAlpha = (1 - dd / 120) * 0.3;
+            starCtx.strokeStyle = accentColor;
+            starCtx.beginPath();
+            starCtx.moveTo(near[a].x, near[a].y);
+            starCtx.lineTo(near[b].x, near[b].y);
+            starCtx.stroke();
+          }
+        }
+      }
+    }
+
+    /* draw far -> near so nearer stars sit on top; sparkle flares + halos on the brighter ones */
+    for (var q = 0; q < display.length; q++) {
+      var p = display[q];
+      var twinkle = reduceMotion ? p.base : p.base + Math.sin(time * p.speed + p.phase) * 0.42;
+      twinkle += Math.min(0.3, (Math.abs(m1.v) + Math.abs(m2.v)) * 0.05) * (0.3 + p.layer * 0.35);
+      if (twinkle < 0.05) twinkle = 0.05;
+      if (p.under) twinkle *= 0.3;
+      var col = p.tint ? tintColor : starColor;
+
+      if (p.halo) {
+        var hg = starCtx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 6);
+        hg.addColorStop(0, col);
+        hg.addColorStop(1, 'rgba(0,0,0,0)');
+        starCtx.globalAlpha = twinkle * 0.28;
+        starCtx.fillStyle = hg;
+        starCtx.beginPath(); starCtx.arc(p.x, p.y, p.r * 6, 0, Math.PI * 2); starCtx.fill();
+      }
+
+      if (p.layer > 0 && twinkle > 0.72) {
+        var flare = (twinkle - 0.72) * 3.2;
+        var len = p.r * (4 + flare * 5);
+        starCtx.globalAlpha = Math.min(1, flare) * 0.85;
+        starCtx.strokeStyle = col;
+        starCtx.lineWidth = Math.max(0.6, p.r * 0.5);
+        starCtx.beginPath();
+        starCtx.moveTo(p.x - len, p.y); starCtx.lineTo(p.x + len, p.y);
+        starCtx.moveTo(p.x, p.y - len); starCtx.lineTo(p.x, p.y + len);
+        starCtx.stroke();
+      }
+
+      starCtx.globalAlpha = Math.min(1, twinkle);
+      starCtx.fillStyle = col;
+      starCtx.beginPath();
+      starCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      starCtx.fill();
+    }
+
+    /* shooting stars */
+    if (!reduceMotion) {
+      if (time > nextShootAt) {
+        spawnShootingStar();
+        nextShootAt = time + 7000 + Math.random() * 10000;
+      }
+      for (var m = shooting.length - 1; m >= 0; m--) {
+        var st = shooting[m];
+        st.x += st.vx; st.y += st.vy; st.life++;
+        var fade = 1 - st.life / st.maxLife;
+        if (fade <= 0) { shooting.splice(m, 1); continue; }
+        var tailX = st.x - st.vx * 6, tailY = st.y - st.vy * 6;
+        var grad = starCtx.createLinearGradient(tailX, tailY, st.x, st.y);
+        grad.addColorStop(0, 'rgba(255,255,255,0)');
+        grad.addColorStop(1, 'rgba(255,255,255,' + (0.9 * fade) + ')');
+        starCtx.globalAlpha = 1;
+        starCtx.strokeStyle = grad;
+        starCtx.lineWidth = 1.6;
+        starCtx.beginPath();
+        starCtx.moveTo(tailX, tailY);
+        starCtx.lineTo(st.x, st.y);
+        starCtx.stroke();
+      }
+    }
+
+    starCtx.globalAlpha = 1;
+    if (!reduceMotion) requestAnimationFrame(drawStars);
+  }
+
+  if (reduceMotion) { drawStars(0); } else { requestAnimationFrame(drawStars); }
+
+  /* ---------- bold point cloud, rotates with scroll ---------- */
+  var pcCanvas = document.getElementById('point-cloud-canvas');
+  if (pcCanvas) {
+    var pcCtx = pcCanvas.getContext('2d');
+    var pcSize, pcDpr;
+    var scrollRotation = 0;
+
+    function pcResize() {
+      pcDpr = Math.min(window.devicePixelRatio || 1, 2);
+      pcSize = pcCanvas.parentElement.clientWidth;
+      pcCanvas.width = pcSize * pcDpr;
+      pcCanvas.height = pcSize * pcDpr;
+      pcCtx.setTransform(pcDpr, 0, 0, pcDpr, 0, 0);
+    }
+    pcResize();
+    window.addEventListener('resize', pcResize);
+
+    /* evenly distributed points on a sphere (Fibonacci sphere) */
+    var N = 150;
+    var points = [];
+    var golden = Math.PI * (3 - Math.sqrt(5));
+    for (var i = 0; i < N; i++) {
+      var yv = 1 - (i / (N - 1)) * 2;
+      var radiusAtY = Math.sqrt(1 - yv * yv);
+      var theta = golden * i;
+      points.push({
+        x: Math.cos(theta) * radiusAtY,
+        y: yv,
+        z: Math.sin(theta) * radiusAtY
+      });
+    }
+
+    function drawPointCloud() {
+      var w = pcSize, h = pcSize;
+      pcCtx.clearRect(0, 0, w, h);
+      var cx = w / 2, cy = h / 2;
+      var R = w * 0.42;
+
+      var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+      var targetRotation = scrollTop * 0.0022;
+      scrollRotation += (targetRotation - scrollRotation) * 0.08;
+
+      var cosA = Math.cos(scrollRotation), sinA = Math.sin(scrollRotation);
+      var cosB = Math.cos(scrollRotation * 0.6), sinB = Math.sin(scrollRotation * 0.6);
+
+      var accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#7FA8FF';
+      var accent2Color = getComputedStyle(document.documentElement).getPropertyValue('--accent-2').trim() || '#BFE4FF';
+
+      var projected = [];
+      for (var i2 = 0; i2 < points.length; i2++) {
+        var p = points[i2];
+        /* rotate around Y axis */
+        var x1 = p.x * cosA - p.z * sinA;
+        var z1 = p.x * sinA + p.z * cosA;
+        /* rotate around X axis */
+        var y2 = p.y * cosB - z1 * sinB;
+        var z2 = p.y * sinB + z1 * cosB;
+
+        var scale = 1.5 / (1.5 - z2 * 0.9);
+        projected.push({
+          x: cx + x1 * R * scale,
+          y: cy + y2 * R * scale,
+          scale: scale,
+          z: z2
+        });
+      }
+
+      projected.sort(function(a, b) { return a.z - b.z; });
+
+      for (var j = 0; j < projected.length; j++) {
+        var pt = projected[j];
+        var depth = (pt.z + 1) / 2;
+        var size = 1.1 + depth * 2.6;
+        var color = j % 4 === 0 ? accent2Color : accentColor;
+        pcCtx.globalAlpha = 0.35 + depth * 0.65;
+        pcCtx.fillStyle = color;
+        pcCtx.beginPath();
+        pcCtx.arc(pt.x, pt.y, size, 0, Math.PI * 2);
+        pcCtx.fill();
+      }
+      pcCtx.globalAlpha = 1;
+
+      if (!reduceMotion) requestAnimationFrame(drawPointCloud);
+    }
+
+    if (!reduceMotion) {
+      requestAnimationFrame(drawPointCloud);
+    } else {
+      drawPointCloud();
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+
+
+  /* ---------- cursor spotlight (pointer devices only) ---------- */
+  var canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (canHover && !reduceMotion) {
+    var spotlight = document.getElementById('spotlight');
+    var sx = hero.clientWidth / 2, sy = hero.clientHeight / 2;
+    var tx = sx, ty = sy;
+
+    hero.addEventListener('mousemove', function(e) {
+      var r = hero.getBoundingClientRect();
+      tx = e.clientX - r.left; ty = e.clientY - r.top;
+      spotlight.style.opacity = '1';
+    }, { passive: true });
+
+    hero.addEventListener('mouseleave', function() {
+      spotlight.style.opacity = '0';
+    });
+
+    function animateSpotlight() {
+      sx += (tx - sx) * 0.12;
+      sy += (ty - sy) * 0.12;
+      spotlight.style.transform = 'translate3d(' + sx + 'px,' + sy + 'px,0)';
+      requestAnimationFrame(animateSpotlight);
+    }
+    requestAnimationFrame(animateSpotlight);
+  }
+
+  /* ---------- email popup ---------- */
+  var dlg = document.getElementById('email-dialog');
+  document.getElementById('email-open').addEventListener('click', function() {
+    if (dlg.showModal) dlg.showModal(); else window.location.href = 'mailto:shinesaucestudios@gmail.com';
+  });
+  document.getElementById('email-close').addEventListener('click', function() { dlg.close(); });
+  dlg.addEventListener('click', function(e) { if (e.target === dlg) dlg.close(); });
+  var copyBtn = document.getElementById('email-copy');
+  copyBtn.addEventListener('click', function() {
+    var done = function() { copyBtn.textContent = 'Copied'; setTimeout(function() { copyBtn.textContent = 'Copy address'; }, 1600); };
+    try { navigator.clipboard.writeText('shinesaucestudios@gmail.com').then(done, function() {}); } catch (e) {}
+  });
+})();
+</script>
+
+</body>
+</html>
